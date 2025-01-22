@@ -1,23 +1,3 @@
-// Begin building Dashboard menu starting with Dropdown menu
-function initializeDashboard() {
-  let dropdownMenu = d3.select("#selDataset");
-  d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
-    let sampleID = data.names;
-    console.log(sampleID); // Log sampleIDs to confirm they were pulled properly
-
-    for (let ea = 0; ea < sampleID.length; ea++) {
-      dropdownMenu
-      .append("option")
-      .text(sampleID[ea])
-      .property("value", sampleID[ea]);
-    }
-
-    let initialSample = sampleID[0];
-    buildCharts(initialSample);
-    buildMetadata(initialSample);
-  });
-}
-
 // Build the metadata panel
 function buildMetadata(selectedSample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
@@ -62,10 +42,32 @@ function buildCharts(selectedSample) {
     
 
     // Build a Bubble Chart
+    let bubbleData = [
+      {
+        y: sampleValues,
+        x: otuID,
+        text: otuLabels,
+        mode: 'markers',
+        marker: {
+          size: sampleValues,
+          color: otuID,
+          colorscale: "Earth"
+        }
+      }
+    ];
 
+    let bubbleLayout = {
+        title: {
+          text: "Bacteria Samples Per Culture",
+        },
+          showlegend: false,
+          xaxis: {title: "OTU ID"},
+          margin: {t:30},
+          hovermode: "closest"
+      };
 
     // Render the Bubble Chart
-
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout);
 
     // For the Bar Chart, map the otu_ids to a list of strings for your yticks
     let chartYTicks = otuID.map(otuID => `OTU: ${otuID}`);
@@ -86,7 +88,6 @@ function buildCharts(selectedSample) {
 
     // Build a Bar Chart
     // Don't forget to slice and reverse the input data appropriately
-    let slicedChart = 
 
     // Render the Bar Chart
     Plotly.newPlot("bar", barChartData, barChartLayout);
@@ -94,25 +95,32 @@ function buildCharts(selectedSample) {
 }
 
 // Function to run on page load
-function init() {
+function  initializeDashboard() {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
     // Get the names field
-
+    let sampleID = data.names;
+    console.log(sampleID); // Log sampleIDs to confirm they were pulled properly
 
     // Use d3 to select the dropdown with id of `#selDataset`
-
+    let dropdownMenu = d3.select("#selDataset");
 
     // Use the list of sample names to populate the select options
     // Hint: Inside a loop, you will need to use d3 to append a new
     // option for each sample name.
-
+    for (let ea = 0; ea < sampleID.length; ea++) {
+      dropdownMenu
+      .append("option")
+      .text(sampleID[ea])
+      .property("value", sampleID[ea]);
+    }
 
     // Get the first sample from the list
-
+    let initialSample = sampleID[0];
 
     // Build charts and metadata panel with the first sample
-
+    buildCharts(initialSample);
+    buildMetadata(initialSample);
   });
 }
 
